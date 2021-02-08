@@ -1,37 +1,65 @@
 #include <iostream>
 #include <string>
+#include <memory>
+#include <vector>
 #include "Adaptor.hpp"
 using namespace std;
 
-class Adaptor_interface {
+class Weapon {
 public:
-  virtual void Item_str(void) = 0;
-  virtual ~Adaptor_interface(){}
+  virtual ~Weapon(){};
 };
 
-class Item {
-private:
-  string name_;
+class Sword : public Weapon {
 public:
-  explicit Item (const string& name): name_(name){}
-  ~Item (){}
-  void Item_str (void){
-    cout << name_ << endl;
+  void Sword_Attribute () { cout << "属性: 斬撃" << endl; }
+};
+
+class Adapted_Sword : public Adapter <Sword> {
+public:
+  void Adapt_function(){
+    Adapt_class->Sword_Attribute();
   }
 };
 
-class Adaptor: public Item, public Adaptor_interface{
+class Spear : public Weapon {
 public:
-    explicit Adaptor(const string& name) : Item(name){}
-    ~Adaptor(){}
-    void Item_str(void){
-      Item_str();
-    }
+  void Spear_Attribute () { cout << "属性: 刺突" << endl; }
+};
+
+class Adapted_Spear : public Adapter <Spear> {
+public:
+  void Adapt_function(){
+    Adapt_class->Spear_Attribute();
+  }
+};
+
+class Hammer : public Weapon{
+public:
+  void Hammer_Attribute () { cout << "属性: 打撃" << endl; }
+};
+
+class Adapted_Hammer : public Adapter <Hammer> {
+public:
+  void Adapt_function(){
+    Adapt_class->Hammer_Attribute();
+  }
 };
 
 int main(){
-  Adaptor *a1 = new Adaptor("Taro");
-  a1->Item_str();
+  vector<Weapon *> list;
+  Weapon *sword = new Adapted_Sword();
+  Weapon *spear = new Adapted_Spear();
+  Weapon *hammer = new Adapted_Hammer();
+  list.emplace_back(sword);
+  list.emplace_back(spear);
+  list.emplace_back(hammer);
+
+  for( auto *it: list){
+    if(dynamic_cast<Adapted_Sword *>(it) != NULL)dynamic_cast<Adapted_Sword *>(it)->Adapt_function();
+    if(dynamic_cast<Adapted_Spear *>(it) != NULL)dynamic_cast<Adapted_Spear *>(it)->Adapt_function();
+    if(dynamic_cast<Adapted_Hammer *>(it) != NULL)dynamic_cast<Adapted_Hammer *>(it)->Adapt_function();
+  }
 
   return 0;
 }
